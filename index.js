@@ -1,18 +1,30 @@
-import('./pkg')
-    .then(wasm => {
-        const canvas = document.getElementById('drawing');
-        const ctx = canvas.getContext('2d');
+import { Remarkable } from 'remarkable';
+import * as wasm from "../pkg/";
 
-        const realInput = document.getElementById('real');
-        const imaginaryInput = document.getElementById('imaginary');
-        const renderBtn = document.getElementById('render');
+// wasm markdown stuff
+const wa = new Remarkable();
+const remarkableDiv = document.getElementById('wasm-markdown');
+const renderRemarkable = text => {
+    const html = wa.render(text);
+    // remarkableDiv.innerHTML = html;
+}
 
-        renderBtn.addEventListener('click', () => {
-            const real = parseFloat(realInput.value) || 0;
-            const imaginary = parseFloat(imaginaryInput.value) || 0;
-            wasm.draw(ctx, 600, 600, real, imaginary);
-        });
+// js markdown stuff
+const wasmDiv = document.getElementById('js-markdown');
+const renderWasm = text => {
+    const html = wasm.render(text);
+    // wasmDiv.innerHTML = html;
+}
 
-        wasm.draw(ctx, 600, 600, -0.15, 0.65);
-    })
-    .catch(console.error);
+const textarea = document.getElementById('input-text');
+textarea.addEventListener('keyup', e => {
+    const text = e.target.value;
+    console.time('remarkable');
+    renderRemarkable(text);
+    console.timeEnd('remarkable');
+
+    console.time('wasm');
+    renderWasm(text);
+    console.timeEnd('wasm');
+});
+
